@@ -1,0 +1,32 @@
+website:
+
+	Volltextsuche:
+	http://www.ncbi.nlm.nih.gov/nuccore/?term=Xanthomonas+albilineans
+
+entrez interface:
+
+	Doku:
+	http://www.ncbi.nlm.nih.gov/books/NBK25501/
+	
+	+-------------------------------------------------------------------------------------------------------------+
+	
+	Workflow Pipeline: esearch -> esummary -> efetch
+	
+	esearch:
+	http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Xanthomonas%20albilineans&retmax=10000
+	
+		--> optional parameter 'retmax' is for increasing data set outputs
+		--> get all IDs and pass it to esummary
+	
+	esummary:
+	http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nuccore&id=386081654,386076359,551465603
+	
+		--> search for all entries where Length >= X and pass it to efetch
+	
+	efetch:
+	http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=386081654&rettype=fasta&retmode=xml
+	
+		--> retmode is the output format like 'text' or 'xml'
+		--> efetch than downloads the output
+	
+	
