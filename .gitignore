@@ -2,3 +2,4 @@
 *.log
 *.fasta
 out/
+fasta/
