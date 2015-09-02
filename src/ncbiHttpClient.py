@@ -1,4 +1,5 @@
 import urllib2
+import re
 from lxml import etree
 from io import StringIO, BytesIO
 
@@ -13,9 +14,10 @@ def sendRequest(url):
 	page = response.read()
 	return page
 
-def esearchUrlBuilder(retStart):
+def esearchUrlBuilder(retStart, searchString):
 	str(retStart)
-	url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Xanthomonas+albilineans&retmax=%s&retstart=%s' %(retMax, retStart)
+	url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term='+searchString+'&retmax=%s&retstart=%s' %(retMax, retStart)
+	#url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Xanthomonas+albilineans&retmax=%s&retstart=%s' %(retMax, retStart)
 	return url_esearch
 
 def esummaryUrlBuilder(fragmentedArray):
@@ -28,16 +30,24 @@ def efetchUrlBuilder(fragmentedArray):
 	url_efetch += ','.join(fragmentedArray)
 	return url_efetch
 
-with open('sequence.fasta.xml', 'wb') as f:
+def processUserInput():
+	searchString = raw_input("Search string: ")
+	searchString = re.sub(r"[^\w\s]", '', searchString) #Remove all non-word characters (everything except numbers and letters)
+	searchString = re.sub(r"\s+", '+', searchString) #Replace all runs of whitespace with a plus
+	print 'User Input: %s' %searchString
+	return searchString
+
+searchString = processUserInput()
+
+# --- clear output file
+with open(searchString+'.fasta', 'wb') as f:
 	f.write('')
 
 elementArray = []
-# --- get all the IDs/Gis
+# --- get all the IDs/Gis for the search string
 while True:
-	url_esearch = esearchUrlBuilder(retStart)
+	url_esearch = esearchUrlBuilder(retStart, searchString)
 	xmlroot = etree.XML(sendRequest(url_esearch)) #.XML() returns root node, .fromstring() as well
-	#retStart = int(xmlroot.find('RetStart').text)
-	#retMax = int(xmlroot.find('RetMax').text)
 	count = int(xmlroot.find('Count').text)
 	print retStart, retMax, count
 
@@ -68,7 +78,6 @@ while True:
 	print 'iter outer loop begin>%d, until>%d i>%d' %(begin, until, i)
 
 	# --- build the ncbi esummary url request with the ids and send it
-	#url_esummary += ','.join(fragmentedArray) #appending transformed string to url
 	url_esummary = esummaryUrlBuilder(fragmentedArray)
 	xmlroot = etree.XML(sendRequest(url_esummary))
 
@@ -88,7 +97,7 @@ while True:
 		print 'url fetch: %s' %url_efetch
 		del fragmentedArray[:]
 
-		with open('sequence.fasta.xml', 'ab') as f:
+		with open(searchString+'.fasta', 'ab') as f:
 			f.write(sendRequest(url_efetch))
 
 	if begin > len(elementArray):
