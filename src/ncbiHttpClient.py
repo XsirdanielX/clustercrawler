@@ -30,6 +30,7 @@ def sendRequest(url):
 			print 'Reason: ', e.reason
 			waiting(retries)
 			retries += 1
+		time.sleep(5)
 	page = response.read()
 	return page
 
@@ -69,9 +70,8 @@ def processStdInput():
 searchString = processStdInput()
 
 # --- clear output file
-if os.path.getsize(searchString+'.fasta') > 0:
-	with open(searchString+'.fasta', 'wb') as f:
-		f.write('')
+with open(searchString+'.fasta', 'wb') as f:
+	f.write('')
 
 elementArray = []
 # --- get all the IDs/Gis for the search string

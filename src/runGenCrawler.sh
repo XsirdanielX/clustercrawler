@@ -20,6 +20,6 @@ echo "Number of fasta files found: ${#fastaFiles[@]}"
 echo "Starting Antismash..."
 for i in `seq 0 ${#fastaFiles[@]}`
 do
-	run_antismash ${fastaFiles[i]} ../out/
+	run_antismash ${fastaFiles[i]} ../out/ --inclusive --borderpredict --full-hmmer
 done
 echo "Antismash completed"
