@@ -1,5 +1,9 @@
 import urllib2
 import re
+import sys
+import time
+import os
+from urllib2 import Request, urlopen, URLError, HTTPError
 from lxml import etree
 from io import StringIO, BytesIO
 
@@ -10,9 +14,31 @@ retStart = '0'
 # --- HTTP request - response to get XML
 def sendRequest(url):
 	req = urllib2.Request(url)
-	response = urllib2.urlopen(req)
+	retries = 1
+	established = False
+	while not established:
+		try:
+			response = urllib2.urlopen(req)
+			established = True
+		except HTTPError as e:
+			print 'The server couldn\'t handle the request.'
+			print 'Error code: ', e.code
+			waiting(retries)
+			retries += 1
+		except URLError as e:
+			print 'Failed to reach a server.'
+			print 'Reason: ', e.reason
+			waiting(retries)
+			retries += 1
 	page = response.read()
 	return page
+
+def waiting(retries):
+	print "%s. retry attempt..." %retries
+	wait = retries * 2
+	if wait > 60:
+		wait = 60
+	time.sleep(wait)
 
 def esearchUrlBuilder(retStart, searchString):
 	str(retStart)
@@ -30,18 +56,22 @@ def efetchUrlBuilder(fragmentedArray):
 	url_efetch += ','.join(fragmentedArray)
 	return url_efetch
 
-def processUserInput():
-	searchString = raw_input("Search string: ")
-	searchString = re.sub(r"[^\w\s]", '', searchString) #Remove all non-word characters (everything except numbers and letters)
-	searchString = re.sub(r"\s+", '+', searchString) #Replace all runs of whitespace with a plus
-	print 'User Input: %s' %searchString
-	return searchString
+def processStdInput():
+	if len(sys.argv) == 0:
+		print 'Usage python ncbiHttpClient.py <search string>'
+	else:
+		searchString = str(sys.argv[1])
+		#searchString = re.sub(r"[^\w\s]", '', searchString) #Remove all non-word characters (everything except numbers and letters)
+		#searchString = re.sub(r"\s+", '+', searchString) #Replace all runs of whitespace with a plus
+		print 'Search term: %s' %searchString
+		return searchString
 
-searchString = processUserInput()
+searchString = processStdInput()
 
 # --- clear output file
-with open(searchString+'.fasta', 'wb') as f:
-	f.write('')
+if os.path.getsize(searchString+'.fasta') > 0:
+	with open(searchString+'.fasta', 'wb') as f:
+		f.write('')
 
 elementArray = []
 # --- get all the IDs/Gis for the search string
@@ -97,8 +127,13 @@ while True:
 		print 'url fetch: %s' %url_efetch
 		del fragmentedArray[:]
 
-		with open(searchString+'.fasta', 'ab') as f:
-			f.write(sendRequest(url_efetch))
+		if os.path.getsize(searchString+'.fasta') > 1000000000:
+			tmpFiller = str(begin)
+			with open(searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
+				f.write(sendRequest(url_efetch))
+		else:
+			with open(searchString+'.fasta', 'ab') as f:
+				f.write(sendRequest(url_efetch))
 
 	if begin > len(elementArray):
 		break
