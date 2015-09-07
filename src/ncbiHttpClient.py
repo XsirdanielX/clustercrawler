@@ -30,7 +30,7 @@ def sendRequest(url):
 			print 'Reason: ', e.reason
 			waiting(retries)
 			retries += 1
-		time.sleep(5)
+		time.sleep(1)
 	page = response.read()
 	return page
 
@@ -70,7 +70,7 @@ def processStdInput():
 searchString = processStdInput()
 
 # --- clear output file
-with open(searchString+'.fasta', 'wb') as f:
+with open('../fasta/'+searchString+'.fasta', 'wb') as f:
 	f.write('')
 
 elementArray = []
@@ -127,12 +127,12 @@ while True:
 		print 'url fetch: %s' %url_efetch
 		del fragmentedArray[:]
 
-		if os.path.getsize(searchString+'.fasta') > 1000000000:
+		if os.path.getsize('../fasta/'+searchString+'.fasta') > 1000000000:
 			tmpFiller = str(begin)
-			with open(searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
+			with open('../fasta/'+searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
 				f.write(sendRequest(url_efetch))
 		else:
-			with open(searchString+'.fasta', 'ab') as f:
+			with open('../fasta/'+searchString+'.fasta', 'ab') as f:
 				f.write(sendRequest(url_efetch))
 
 	if begin > len(elementArray):

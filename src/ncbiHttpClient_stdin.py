@@ -54,7 +54,6 @@ def waiting(retries):
 		wait = 60
 	time.sleep(wait)
 
-
 def esearchUrlBuilder(retStart, searchString):
 	str(retStart)
 	url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term='+searchString+'&retmax=%s&retstart=%s' %(retMax, retStart)

@@ -4,7 +4,7 @@
 if [ $# -ne 1 ]; then
 	echo ""
     echo "$0 - Usage: ./runGenCrawler <search term>"
-    echo "As a whitespace please use '+'"
+    echo "As a whitespace please use '+' instead"
     exit 1
 fi
 
