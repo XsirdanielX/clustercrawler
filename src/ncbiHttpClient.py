@@ -3,6 +3,7 @@ import re
 import sys
 import time
 import os
+import glob
 from urllib2 import Request, urlopen, URLError, HTTPError
 from lxml import etree
 from io import StringIO, BytesIO
@@ -59,7 +60,7 @@ def efetchUrlBuilder(fragmentedArray):
 
 def processStdInput():
 	if len(sys.argv) == 0:
-		print 'Usage python ncbiHttpClient.py <search string>'
+		print 'Usage: >python ncbiHttpClient.py <search string>'
 	else:
 		searchString = str(sys.argv[1])
 		#searchString = re.sub(r"[^\w\s]", '', searchString) #Remove all non-word characters (everything except numbers and letters)
@@ -67,11 +68,25 @@ def processStdInput():
 		print 'Search term: %s' %searchString
 		return searchString
 
-searchString = processStdInput()
+def createFolder(searchString):
+	timestamp = time.strftime("%Y%m%d-%H:%M:%S")
+	path = '../fasta/'+searchString+'_'+timestamp+'/'
+	print 'Fasta files downloading to path: %s' %(path)
+	try: 
+	    os.makedirs(path)
+	except OSError:
+	    if not os.path.isdir(path):
+	    	raise
+	return path
 
-# --- clear output file
-with open('../fasta/'+searchString+'.fasta', 'wb') as f:
-	f.write('')
+searchString = processStdInput()
+path = createFolder(searchString)
+
+# --- clear output files in folder
+# TODO: ?ask user whether he wants to delete all files?
+filelist = glob.glob(path+'*.fasta')
+for f in filelist:
+    os.remove(f)
 
 elementArray = []
 # --- get all the IDs/Gis for the search string
@@ -127,13 +142,24 @@ while True:
 		print 'url fetch: %s' %url_efetch
 		del fragmentedArray[:]
 
-		if os.path.getsize('../fasta/'+searchString+'.fasta') > 1000000000:
-			tmpFiller = str(begin)
-			with open('../fasta/'+searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
-				f.write(sendRequest(url_efetch))
+		if os.path.exists(path+searchString+'.fasta'):
+			if os.path.getsize(path+searchString+'.fasta') > 1000000000:
+				tmpFiller = str(begin)
+				with open(path+searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
+					f.write(sendRequest(url_efetch))
+			else:
+				with open(path+searchString+'.fasta', 'ab') as f:
+					f.write(sendRequest(url_efetch))
+
 		else:
-			with open('../fasta/'+searchString+'.fasta', 'ab') as f:
+			with open(path+searchString+'.fasta', 'w') as f:
 				f.write(sendRequest(url_efetch))
+
+
+
+
+
+
 
 	if begin > len(elementArray):
 		break
