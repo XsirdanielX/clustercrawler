@@ -31,7 +31,7 @@ def sendRequest(url):
 			print 'Reason: ', e.reason
 			waiting(retries)
 			retries += 1
-		time.sleep(2)
+		time.sleep(1)
 	page = response.read()
 	return page
 
