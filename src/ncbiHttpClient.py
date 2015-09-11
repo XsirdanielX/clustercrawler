@@ -8,7 +8,7 @@ from urllib2 import Request, urlopen, URLError, HTTPError
 from lxml import etree
 from io import StringIO, BytesIO
 
-bpLinearDNA = 3800000
+bpLinearDNA = 100000
 retMax = '100'
 retStart = '0'
 
@@ -31,7 +31,7 @@ def sendRequest(url):
 			print 'Reason: ', e.reason
 			waiting(retries)
 			retries += 1
-		time.sleep(1)
+		time.sleep(2)
 	page = response.read()
 	return page
 
@@ -69,9 +69,12 @@ def processStdInput():
 		return searchString
 
 def createFolder(searchString):
-	timestamp = time.strftime("%Y%m%d-%H:%M:%S")
-	path = '../fasta/'+searchString+'_'+timestamp+'/'
-	print 'Fasta files downloading to path: %s' %(path)
+	#timestamp = time.strftime("%Y%m%d-%H:%M:%S")
+	#path = '../fasta/'+searchString+'_'+timestamp+'/'
+	
+	path = '../fasta/'+searchString+'/'
+	
+	print 'Fasta files downloading to: %s' %(path)
 	try: 
 	    os.makedirs(path)
 	except OSError:
@@ -94,24 +97,27 @@ while True:
 	url_esearch = esearchUrlBuilder(retStart, searchString)
 	xmlroot = etree.XML(sendRequest(url_esearch)) #.XML() returns root node, .fromstring() as well
 	count = int(xmlroot.find('Count').text)
-	print retStart, retMax, count
+	#print retStart, retMax, count
 
 	for xmlchilds in xmlroot.iter('Id'):
 		elementArray.append(xmlchilds.text)
-		
+	
 	retStart = int(retStart)
 	retMax = int(retMax)
 	retStart += retMax
-	print retStart
+	if retStart > count:
+		retStart = count
 
-	if(retStart > count):
+	print '%d datasets of %d for further processing downloaded' %(retStart, count)
+
+	if(retStart == count):
 		break
 
 begin = 0
 until = retMax
 fragmentedArray = []
 while True:
-	print 'range: %d' %(len(elementArray))
+	#print 'range: %d' %(len(elementArray))
 	for i in range(begin, until):
 		#print 'iter inner loop %d: %s' %(i, elementArray[i])
 		fragmentedArray.append(elementArray[i])
@@ -119,8 +125,6 @@ while True:
 	until += retMax
 	if until >= len(elementArray):
 		until = len(elementArray)
-	
-	print 'iter outer loop begin>%d, until>%d i>%d' %(begin, until, i)
 
 	# --- build the ncbi esummary url request with the ids and send it
 	url_esummary = esummaryUrlBuilder(fragmentedArray)
@@ -143,23 +147,16 @@ while True:
 		del fragmentedArray[:]
 
 		if os.path.exists(path+searchString+'.fasta'):
-			if os.path.getsize(path+searchString+'.fasta') > 1000000000:
+			if os.path.getsize(path+searchString+'.fasta') > 100000000000:
 				tmpFiller = str(begin)
 				with open(path+searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
 					f.write(sendRequest(url_efetch))
 			else:
 				with open(path+searchString+'.fasta', 'ab') as f:
 					f.write(sendRequest(url_efetch))
-
 		else:
 			with open(path+searchString+'.fasta', 'w') as f:
 				f.write(sendRequest(url_efetch))
-
-
-
-
-
-
 
 	if begin > len(elementArray):
 		break
