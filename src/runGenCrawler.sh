@@ -28,4 +28,4 @@ do
 done
 echo "Antismash completed"
 
-sshpass -p "dewI15.." scp ./out.log alexander.platz@sshgate.tu-berlin.de:~/public_html/genCrawler/
+sshpass -p "...." scp ./out.log alexander.platz@sshgate.tu-berlin.de:~/public_html/genCrawler/
