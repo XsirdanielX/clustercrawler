@@ -8,7 +8,7 @@ from urllib2 import Request, urlopen, URLError, HTTPError
 from lxml import etree
 from io import StringIO, BytesIO
 
-bpLinearDNA = 100000
+bpLinearDNA = 3800000
 retMax = '100'
 retStart = '0'
 
