@@ -58,14 +58,10 @@ def esearchUrlBuilder(retStart, searchString):
 	#url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Xanthomonas+albilineans&retmax=%s&retstart=%s' %(retMax, retStart)
 	return url_esearch
 
-
-
-
-
-
 print """\
 Content-Type: text/html\n
-<html><body>
+<html>
+<body>
 	<p>The submitted search term was: "%s"</p>
 """ % searchString
 
@@ -98,7 +94,8 @@ while True:
 
 
 print """\
-</body></html>
+</body>
+</html>
 """
 
 #os.system("ncbiHttpClient.py %s" %name)
