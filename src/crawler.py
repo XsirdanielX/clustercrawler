@@ -16,8 +16,8 @@ retStart = '0'
 # -------------------------------------------------+
 # --- | html form | -------------------------------+
 form = cgi.FieldStorage() # instantiate only once!
-searchString = form.getvalue('name')
-
+searchString = form.getvalue('term')
+#bpLinearDNA = form.getvalue('bp')
 # --- Avoid script injection escaping the user input
 searchString = cgi.escape(searchString)
 
@@ -90,8 +90,6 @@ while True:
 
 	if(retStart == count):
 		break
-
-
 
 print """\
 </body>
