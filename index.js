@@ -1,7 +1,6 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
 var zerorpc = require("zerorpc")
 
 var connectionCount = 0;
@@ -23,19 +22,6 @@ io.on('connect', function(client) {
 
 
 
-	var c = new zerorpc.Client();
-	c.connect("tcp://127.0.0.1:4242");
-
-	c.invoke("hello", "RPC", function(error, res, more) {
-    	console.log(res);
-	});
-
-
-
-
-
-
-
 	console.log('new job, '+connectionCount+' jobs are running.');
 	client.on('disconnect', function() {
 		connectionCount--;
@@ -49,8 +35,12 @@ io.on('connect', function(client) {
 	
 	// --- Message from client
 	client.on('msg', function(data) {
-		console.log('Message from client: ' +data);
-		client.emit('msg', 'Echo: ' +data);
-		
-	});
+		var c = new zerorpc.Client();
+        c.connect("tcp://127.0.0.1:4242");
+        c.invoke("hello", "RPC: "+data, function(error, res, more) {
+        	console.log(res);
+	        console.log('Message from client: ' +data);
+	        client.emit('msg', 'Echo Node.js: ' +res);
+		});
+    });
 });

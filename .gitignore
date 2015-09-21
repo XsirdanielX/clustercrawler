@@ -1,5 +1,6 @@
 *.xml
 *.log
 *.fasta
+fasta/
 out/
 node_modules/
