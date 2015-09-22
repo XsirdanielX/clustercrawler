@@ -37,7 +37,7 @@ io.on('connect', function(client) {
         c.invoke("crawl", data, function(error, res, more) {
         	console.log(res);
 	        console.log('Message from client: ' +data);
-	        client.emit('msg', 'Echo Node.js: ' +res);
+	        client.emit('msg', 'Node.js: ' +res);
 		});
     });
 
