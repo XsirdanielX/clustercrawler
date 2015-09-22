@@ -1,9 +1,11 @@
 #!\Python27\python.exe
 
 import zerorpc
+import time
 
 class HelloRPC(object):
     def hello(self, name):
+    	time.sleep(5)
         return "RPC Backend: Echo: %s" % name
 
 s = zerorpc.Server(HelloRPC())

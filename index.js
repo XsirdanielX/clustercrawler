@@ -19,9 +19,6 @@ app.get('/test', function(req, res){
 
 io.on('connect', function(client) {
 	connectionCount++;
-
-
-
 	console.log('new job, '+connectionCount+' jobs are running.');
 	client.on('disconnect', function() {
 		connectionCount--;
@@ -37,10 +34,16 @@ io.on('connect', function(client) {
 	client.on('msg', function(data) {
 		var c = new zerorpc.Client();
         c.connect("tcp://127.0.0.1:4242");
-        c.invoke("hello", "RPC: "+data, function(error, res, more) {
+        c.invoke("crawl", data, function(error, res, more) {
         	console.log(res);
 	        console.log('Message from client: ' +data);
 	        client.emit('msg', 'Echo Node.js: ' +res);
 		});
+    });
+
+    // --- Message from server
+    client.on('srvMsg', function(data) {
+    	console.log('Message from server: ' +data);
+    	client.emit('msg', 'Server message: ' +data);
     });
 });
