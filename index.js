@@ -32,9 +32,9 @@ io.on('connect', function(client) {
 	
 	// --- Message from client
 	client.on('msg', function(data) {
-		var c = new zerorpc.Client();
-        c.connect("tcp://127.0.0.1:4242");
-        c.invoke("crawl", data, function(error, res, more) {
+		var rpcClient = new zerorpc.Client();
+        rpcClient.connect("tcp://127.0.0.1:4242");
+        rpcClient.invoke("crawl", data, function(error, res, more) {
         	console.log(res);
 	        console.log('Message from client: ' +data);
 	        client.emit('msg', 'Node.js: ' +res);

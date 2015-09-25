@@ -50,7 +50,6 @@ class Crawler(object):
 			if(retStart == count):
 				break
 				#return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
-
 		begin = 0
 		until = retMax
 		fragmentedArray = []
@@ -97,10 +96,11 @@ class Crawler(object):
 						f.write(self.sendRequest(url_efetch))
 
 			if begin > len(elementArray):
-				break
-				#return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
 				print 'finish'
 				return "Python Backend finished processing."
+				#break
+				#return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
+				
 
 	def esearchUrlBuilder(self, retStart, retMax, searchString):
 		str(retStart)
