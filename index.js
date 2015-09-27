@@ -32,12 +32,22 @@ io.on('connect', function(client) {
 	
 	// --- Message from client
 	client.on('msg', function(data) {
-		var rpcClient = new zerorpc.Client();
+		var rpcClient = new zerorpc.Client({timeout: 60, heartbeatInterval: 60000});
         rpcClient.connect("tcp://127.0.0.1:4242");
+        rpcClient.on("error", function(error) {
+        	console.error("RPC client error:", error);
+        });
+
         rpcClient.invoke("crawl", data, function(error, res, more) {
-        	console.log(res);
-	        console.log('Message from client: ' +data);
-	        client.emit('msg', 'Node.js: ' +res);
+        	if(error) {
+        		console.error("RPC invoke error:", error);
+        		client.emit('RPC invoke error: ' +error);
+        	}
+        	else {
+	        	console.log(res);
+		        console.log('Message from client: ' +data);
+		        client.emit('msg', 'Node.js: ' +res);
+		    }
 		});
     });
 
