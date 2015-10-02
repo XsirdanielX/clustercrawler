@@ -28,6 +28,11 @@ class Crawler(object):
 		searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
 		path = self.createFolder(searchString)
 
+		# --- communication with node zerorpc
+		#zeroRpcClient = zerorpc.Client()
+		#zeroRpcClient.connect("tcp://127.0.0.1:4243")
+		#print zeroRpcClient.sendReply("Zerorpc Client up.")
+
 		elementArray = []
 		# --- get all the IDs/Gis for the search string
 		while True:
@@ -46,6 +51,9 @@ class Crawler(object):
 				retStart = count
 
 			print '%d datasets of %d for further processing downloaded' %(retStart, count)
+
+			# --- communication with node zerorpc
+			#zeroRpcClient.sendReply('%d datasets of %d for further processing downloaded' %(retStart, count))
 
 			if(retStart == count):
 				break
@@ -97,9 +105,9 @@ class Crawler(object):
 
 			if begin > len(elementArray):
 				print 'finish'
-				return "Python Backend finished processing."
+				#return "Python Backend finished processing."
 				#break
-				#return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
+				return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
 				
 
 	def esearchUrlBuilder(self, retStart, retMax, searchString):

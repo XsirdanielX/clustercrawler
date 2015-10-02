@@ -38,6 +38,16 @@ io.on('connect', function(client) {
         	console.error("RPC client error:", error);
         });
 
+        // --- create a zerorpc server
+        /*var rpcServer = new zerorpc.Server ({
+        	sendReply: function(msg, reply) {
+        		reply(null, "node zerorpc: from RPC backend: ", msg);
+        		//console.log(msg);
+        		client.emit('From Backend: ' +msg);
+        	}
+        })
+        rpcServer.bind("tcp://0.0.0.0:4243");*/
+
         rpcClient.invoke("crawl", data, function(error, res, more) {
         	if(error) {
         		console.error("RPC invoke error:", error);
