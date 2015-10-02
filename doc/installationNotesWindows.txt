@@ -1,0 +1,5 @@
+https://github.com/nodejs/node-gyp/wiki/Visual-Studio-2010-Setup
+From this link, easy solution did it finally.
+
+Just >npm install zerorpc --save with Windows SDK 7.1 command prompt.
+Before switch to node.js v0.10.40 with >nvmw use v0.10.40
