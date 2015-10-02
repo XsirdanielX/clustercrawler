@@ -1,4 +1,3 @@
-#!\Python27\python.exe
 import zerorpc
 import urllib2
 import os
@@ -16,14 +15,14 @@ class Crawler(object):
 	retMax = '100'
 	retStart = '0'
 
-	#TODO: Create python socket.io client to communicate with html view.
-	#      Every print shall be a message from here via node.js server
-	#      to the html view. The node.js server is already prepared.
+	# --- TODO: Create python socket.io client to communicate with html view.
+	# ---       Every print shall be a message from here via node.js server
+	# ---       to the html view. The node.js server is already prepared.
 
 	def crawl(self, searchString):
-		retMax = Crawler.retMax
-		retStart = Crawler.retStart
-		bpLinearDNA = Crawler.bpLinearDNA
+		retMax = self.retMax
+		retStart = self.retStart
+		bpLinearDNA = self.bpLinearDNA
 		searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
 		searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
 		path = self.createFolder(searchString)
@@ -57,7 +56,7 @@ class Crawler(object):
 
 			if(retStart == count):
 				break
-				#return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
+
 		begin = 0
 		until = retMax
 		fragmentedArray = []
@@ -104,12 +103,10 @@ class Crawler(object):
 						f.write(self.sendRequest(url_efetch))
 
 			if begin > len(elementArray):
-				print 'finish'
-				#return "Python Backend finished processing."
-				#break
+				print 'Backend finished.'
 				return 'RPC Backend: %d datasets of %d for further processing downloaded' %(retStart, count)
+				#break
 				
-
 	def esearchUrlBuilder(self, retStart, retMax, searchString):
 		str(retStart)
 		url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term='+searchString+'&retmax=%s&retstart=%s' %(retMax, retStart)

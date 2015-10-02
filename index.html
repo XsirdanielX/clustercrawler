@@ -18,11 +18,7 @@
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
     <script>
     	var socket = io.connect('http://localhost:3333');
-			
-        //socket.on('connect', function(data) {
-        socket.emit('join', 'Message from client');
-            //alert(data);
-        //});
+        socket.emit('join', 'Join message from client');
 
         // --- Message from server
 		socket.on('msg', function(data) {
@@ -31,7 +27,7 @@
 			$("#output").prepend(html);
 		});
 
-		// --- form submit
+		// --- form submit and value from text field
 		$('form').submit(function(){
 			socket.emit('msg', $('[name=term]').val());
 			return false;
