@@ -31,25 +31,84 @@
         });
     </script>
 
+    <style>
+    table {
+        border-collapse: collapse;
+    }
+
+    table, td, th {
+        padding: 10px;
+        border: 1px solid black;
+    }
+
+    #outerTable {
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
+    }
+    #innerTableLeft {
+        float: left;
+    }
+    #innerTableRight {
+        padding: 2px;
+    }
+    /*.paramDescr {
+        width: 150px;
+    }*/
+    </style>
+
 </head>
 <body>
     <h1>clusterCrawler</h1>
     <h4>run antiSMASH</h4>
 
     <form id="crawl" method="POST" action="#">
-        <table style="width:50%">
-            <tr>
-                <td>search term:</td>
-                <td><input type="text" name="crawl_data" id="crawl_data" placeholder="Search term"></td>
-                <td>xxx</td>
-            </tr>
-            <tr>
-                <td>base pair:</td>
-                <td><input type="text" name="crawl_bp" id="crawl_bp" placeholder="base pair (default: 3800000)"></td>
-                <td>xxx</td>
-            </tr>
+        <table id="outerTable">
+            <tr><td>
+                <table id="innerTableLeft">
+                    <tr>
+                        <td>search term:</td>
+                        <td><input type="text" name="crawl_data" id="crawl_data" placeholder="Search term"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>base pair:</td>
+                        <td><input type="text" name="crawl_bp" id="crawl_bp" placeholder="bp (default: 3800000)"></td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                <table id="innerTableRight">
+                    <tr>
+                        <td><input type="checkbox" name="inclusive" value="inclusive">inclusive</td>
+                        <td class="paramDescr">Use inclusive ClusterFinder algorithm for additional cluster detection</td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" name="borderpredict" value="borderpredict">borderpredict</td>
+                        <td class="paramDescr">Use ClusterFinder algorithm to predict gene cluster borders</td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" name="full-hmmer" value="full-hmmer">full-hmmer</td>
+                        <td class="paramDescr">Run a whole-genome HMMer analysis</td>
+                    </tr>
+                    <tr style="color:#BDBDBD;">
+                        <td><input type="checkbox" name="clusterblast" value="clusterblast">clusterblast</td>
+                        <td class="paramDescr">BLAST identified clusters against sequenced clusters</td>
+                    </tr>
+
+
+                </table>
+            </td></tr>
         </table>
-        <input type="submit" value="Crawl">
+
+        <table>
+            <tr><input type="submit" value="Crawl"></tr>
+        </table>
+
+
+
+
+
+
     </form>
 
     <h2>Output:</h2>

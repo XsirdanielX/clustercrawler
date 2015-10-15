@@ -312,8 +312,8 @@ def runAntismash(path, searchString):
     'count': session['receive_count']})
 
     # --- http://www.cyberciti.biz/faq/python-run-external-command-and-get-output/
-    #cmd = 'run_antismash '+path+''+searchString+'.fasta ../out'
-    cmd = 'ls -al'
+    cmd = 'run_antismash '+path+''+searchString+'.fasta ../out --inclusive --full-hmmer --borderpredict'
+    #cmd = 'ls -al'
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
     p_status = p.wait()
