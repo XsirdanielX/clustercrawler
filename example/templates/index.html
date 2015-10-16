@@ -24,36 +24,46 @@
             // handlers for the different forms in the page
             // these send data to the server in a variety of ways
             $('form#crawl').submit(function(event) {
-                socket.emit('crawling', {searchString: $('#crawl_data').val(),
-                    bp: $('#crawl_bp').val()});
+                // --- values of checked checkboxes
+                var antismash_params = [];
+                $(':checkbox:checked').each(function(i){
+                    antismash_params[i] = $(this).val();
+                });
+
+                socket.emit('crawling', {
+                    searchString: $('#crawl_term').val(),
+                    bp: $('#crawl_bp').val(),
+                    antismash_params: antismash_params
+                });
                 return false;
             });
         });
     </script>
 
     <style>
-    table {
-        border-collapse: collapse;
-    }
+        table {
+            border-collapse: collapse;
+        }
 
-    table, td, th {
-        padding: 10px;
-        border: 1px solid black;
-    }
+        table, td, th {
+            padding: 10px;
+            /*border: 1px solid black;*/
+        }
 
-    #outerTable {
-        border-bottom: 1px solid black;
-        border-top: 1px solid black;
-    }
-    #innerTableLeft {
-        float: left;
-    }
-    #innerTableRight {
-        padding: 2px;
-    }
-    /*.paramDescr {
-        width: 150px;
-    }*/
+        #outerTable {
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            width: 75%;
+        }
+        #innerTableLeft {
+            float: left;
+        }
+        #innerTableRight {
+            padding: 2px;
+        }
+        .paramDescr {
+            font-size: 85%;
+        }
     </style>
 
 </head>
@@ -62,52 +72,51 @@
     <h4>run antiSMASH</h4>
 
     <form id="crawl" method="POST" action="#">
-        <table id="outerTable">
-            <tr><td>
-                <table id="innerTableLeft">
+
+            <div id="outerTable">
+
+                <div id="innerTableLeft"><table>
                     <tr>
                         <td>search term:</td>
-                        <td><input type="text" name="crawl_data" id="crawl_data" placeholder="Search term"></td>
+                        <td><input type="text" id="crawl_term" placeholder="Search term"></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td>base pair:</td>
-                        <td><input type="text" name="crawl_bp" id="crawl_bp" placeholder="bp (default: 3800000)"></td>
+                        <td><input type="text" id="crawl_bp" placeholder="bp (default: 3800000)"></td>
                         <td></td>
                     </tr>
-                </table>
-
-                <table id="innerTableRight">
                     <tr>
-                        <td><input type="checkbox" name="inclusive" value="inclusive">inclusive</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table></div>
+
+                <div id="innerTableRight"><table>
+                    <tr>
+                        <td><input type="checkbox" id="crawl_inclusive" name="antismash_params" value="--inclusive"></td>
+                        <td>inclusive</td>
                         <td class="paramDescr">Use inclusive ClusterFinder algorithm for additional cluster detection</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="borderpredict" value="borderpredict">borderpredict</td>
+                        <td><input type="checkbox" id="crawl_borderpredict" name="antismash_params" value="--borderpredict"></td>
+                        <td>borderpredict</td>
                         <td class="paramDescr">Use ClusterFinder algorithm to predict gene cluster borders</td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" name="full-hmmer" value="full-hmmer">full-hmmer</td>
+                        <td><input type="checkbox" id="crawl_full-hmmer" name="antismash_params" value="--full-hmmer"></td>
+                        <td>full-hmmer</td>
                         <td class="paramDescr">Run a whole-genome HMMer analysis</td>
                     </tr>
                     <tr style="color:#BDBDBD;">
-                        <td><input type="checkbox" name="clusterblast" value="clusterblast">clusterblast</td>
+                        <td><input hidden="true" type="checkbox" id="crawl_clusterblast" name="antismash_params" value="--clusterblast"></td>
+                        <td>clusterblast</td>
                         <td class="paramDescr">BLAST identified clusters against sequenced clusters</td>
                     </tr>
-
-
-                </table>
-            </td></tr>
-        </table>
-
-        <table>
-            <tr><input type="submit" value="Crawl"></tr>
-        </table>
-
-
-
-
-
+                </table></div>
+                <input type="submit" value="Crawl">
+            </div>
 
     </form>
 

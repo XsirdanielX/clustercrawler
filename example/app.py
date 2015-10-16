@@ -3,7 +3,7 @@ monkey.patch_all()
 
 import time
 from threading import Thread
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, \
     close_room, disconnect
 
@@ -130,6 +130,8 @@ def crawl(message):
          'count': session['receive_count']})
         return
 
+    antismashParams = message['antismash_params']
+
     # --- | globals | ---------------------------------+
     defaultBP = 3800000
     retMax = '100'
@@ -153,8 +155,6 @@ def crawl(message):
 
         if retMax > count:
             retMax = count
-
-        #print retStart, retMax, count
 
         for xmlchilds in xmlroot.iter('Id'):
             elementArray.append(xmlchilds.text)
@@ -209,7 +209,7 @@ def crawl(message):
             del fragmentedArray[:]
 
             if os.path.exists(path+searchString+'.fasta'):
-                if os.path.getsize(path+searchString+'.fasta') > 10000000000:
+                if os.path.getsize(path+searchString+'.fasta') > 40000000000:
                     tmpFiller = str(begin)
                     with open(path+searchString+'_'+tmpFiller+'.fasta', 'ab') as f:
                         f.write(sendRequest(url_efetch))
@@ -233,7 +233,7 @@ def crawl(message):
             'count': session['receive_count']})
             break
 
-    runAntismash(path, searchString)
+    runAntismash(path, searchString, antismashParams)
 
 
 def checkBP(userBP, defaultBP):
@@ -305,15 +305,17 @@ def createFolder(searchString):
         os.remove(f)
     return path
 
-def runAntismash(path, searchString):
-    print 'run_antismash %s%s.fasta ../out' %(path, searchString)
+def runAntismash(path, searchString, antismashParams):
     emit('my response',
     {'data': 'antiSMASH running...',
     'count': session['receive_count']})
 
+    cmd = 'run_antismash '+path+''+searchString+'.fasta ../out '
+    if antismashParams:
+        cmd += ' '.join(antismashParams)
+        print 'antiSMASH Command: %s' %cmd
+        
     # --- http://www.cyberciti.biz/faq/python-run-external-command-and-get-output/
-    cmd = 'run_antismash '+path+''+searchString+'.fasta ../out --inclusive --full-hmmer --borderpredict'
-    #cmd = 'ls -al'
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
     p_status = p.wait()
@@ -329,7 +331,7 @@ def runAntismash(path, searchString):
         {'data': 'antiSMASH run successfully completed.',
         'count': session['receive_count']})
 
-
+    return redirect('http://www.tu-berlin.de')
 
 
 
