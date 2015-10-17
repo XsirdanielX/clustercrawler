@@ -6,6 +6,9 @@ from threading import Thread
 from flask import Flask, render_template, session, request, redirect
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, \
     close_room, disconnect
+#from flask.ext.wtf import Form
+#from wtforms import StringField, BooleanField
+#from wtforms.validators import DataRequired
 
 # imports genCrawler --->
 import urllib2
@@ -20,9 +23,9 @@ from lxml import etree
 from io import StringIO, BytesIO
 # <--- imports genCrawler
 
-
 app = Flask(__name__)
 app.debug = True
+WTF_CSRF_ENABLED = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 thread = None
@@ -119,30 +122,16 @@ def test_disconnect():
 @socketio.on('crawling', namespace='/test')
 def crawl(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my response',
-         {'data': 'Your search term: '+message['searchString']+', bp: '+message['bp'],
-         'count': session['receive_count']})
-
-    if message['searchString'] == '':
-        print 'empty string'
-        emit('my response',
-         {'data': 'Your search term is empty. Job aborted.',
-         'count': session['receive_count']})
+    searchString, defaultBP, antismashParams, validationErr = validateUserInput(message)
+    if validationErr == True:
         return
 
-    antismashParams = message['antismash_params']
 
     # --- | globals | ---------------------------------+
-    defaultBP = 3800000
     retMax = '100'
     retStart = '0'
-    searchString = str(message['searchString'])
-    searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
-    searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
+    
     path = createFolder(searchString)
-
-    if message['bp'] != '':
-        defaultBP = checkBP(int(message['bp']), defaultBP)
 
     elementArray = []
     # --- get all the IDs/Gis for the search string
@@ -236,11 +225,6 @@ def crawl(message):
     runAntismash(path, searchString, antismashParams)
 
 
-def checkBP(userBP, defaultBP):
-    print 'local bp: %d, global bp: %d' %(userBP, defaultBP)
-    if userBP != defaultBP:
-        defaultBP = userBP
-    return defaultBP
              
 def esearchUrlBuilder(retStart, retMax, searchString):
     str(retStart)
@@ -305,6 +289,49 @@ def createFolder(searchString):
         os.remove(f)
     return path
 
+def validateUserInput(message):
+    print 'validating user input'
+    searchString = ''
+    defaultBP = 3800000
+    antismashParams = ''
+    validationErr = False
+
+    if not message['searchString']:
+        print 'empty string'
+        emit('my response',
+        {'data': 'Your search term is empty. Job aborted.',
+        'count': session['receive_count']})
+        validationErr = True
+    else:
+        searchString = str(message['searchString'])
+        searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
+        searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
+
+    if message['bp']:
+        userBP = str(message['bp'])
+        if userBP.isdigit():
+            userBP = int(userBP)
+        else:
+            print 'BP has to be numeric. Job aborted.'
+            emit('my response',
+            {'data': 'BP has to be numeric. Job aborted.',
+            'count': session['receive_count']})
+            validationErr = True
+
+        print 'local bp: %s, global bp: %s' %(userBP, defaultBP)
+        if userBP != defaultBP:
+            defaultBP = userBP
+
+    if message['antismash_params']:
+        antismashParams = message['antismash_params']
+
+    emit('my response',
+         {'data': 'Your search term: '+message['searchString']+', bp: '+message['bp'],
+         'count': session['receive_count']})
+
+    return searchString, defaultBP, antismashParams, validationErr
+
+
 def runAntismash(path, searchString, antismashParams):
     emit('my response',
     {'data': 'antiSMASH running...',
@@ -313,23 +340,24 @@ def runAntismash(path, searchString, antismashParams):
     cmd = 'run_antismash '+path+''+searchString+'.fasta ../out '
     if antismashParams:
         cmd += ' '.join(antismashParams)
-        print 'antiSMASH Command: %s' %cmd
+        
+    print 'antiSMASH Command: %s' %cmd
         
     # --- http://www.cyberciti.biz/faq/python-run-external-command-and-get-output/
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-    (output, err) = p.communicate()
-    p_status = p.wait()
-    print "Command output : ", output
-    print "Command exit status/return code : ", p_status
+    #p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    #(output, err) = p.communicate()
+    #p_status = p.wait()
+    #print "Command output : ", output
+    #print "Command exit status/return code : ", p_status
 
-    if p_status != 0:
-        emit('my response',
-        {'data': 'antiSMASH run not successful.',
-        'count': session['receive_count']})
-    else:
-        emit('my response',
-        {'data': 'antiSMASH run successfully completed.',
-        'count': session['receive_count']})
+    #if p_status != 0:
+    #    emit('my response',
+    #    {'data': 'antiSMASH run not successful.',
+    #    'count': session['receive_count']})
+    #else:
+    #    emit('my response',
+    #    {'data': 'antiSMASH run successfully completed.',
+    #    'count': session['receive_count']})
 
     return redirect('http://www.tu-berlin.de')
 
