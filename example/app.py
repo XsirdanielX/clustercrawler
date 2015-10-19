@@ -325,9 +325,10 @@ def validateUserInput(message):
     if message['antismash_params']:
         antismashParams = message['antismash_params']
 
-    emit('my response',
-         {'data': 'Your search term: '+message['searchString']+', bp: '+message['bp'],
-         'count': session['receive_count']})
+    if validationErr == False:
+        emit('my response',
+             {'data': 'Your search term: '+message['searchString']+', bp: '+message['bp'],
+             'count': session['receive_count']})
 
     return searchString, defaultBP, antismashParams, validationErr
 
