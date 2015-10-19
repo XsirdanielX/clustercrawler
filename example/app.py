@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from gevent import monkey
 monkey.patch_all()
 
@@ -293,6 +295,7 @@ def validateUserInput(message):
     print 'validating user input'
     searchString = ''
     defaultBP = 3800000
+    userBP = ''
     antismashParams = ''
     validationErr = False
 
@@ -303,12 +306,27 @@ def validateUserInput(message):
         'count': session['receive_count']})
         validationErr = True
     else:
-        searchString = str(message['searchString'])
-        searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
-        searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
+        try:
+            searchString = message['searchString'].decode('ascii')
+            searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
+            searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
+        except:
+            print 'Non ascii characters.'
+            emit('my response',
+            {'data': 'Your search term contains non-processable characters. Job aborted.',
+            'count': session['receive_count']})
+            validationErr = True
 
     if message['bp']:
-        userBP = str(message['bp'])
+        try:
+            userBP = message['bp'].decode('ascii') 
+        except:
+            print 'Non ascii characters.'
+            emit('my response',
+            {'data': 'Your base pair contains non-processable characters. Job aborted.',
+            'count': session['receive_count']})
+            validationErr = True
+
         if userBP.isdigit():
             userBP = int(userBP)
         else:
