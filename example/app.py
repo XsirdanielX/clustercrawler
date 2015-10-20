@@ -293,21 +293,21 @@ def createFolder(searchString):
 
 def validateUserInput(message):
     print 'validating user input'
-    searchString = ''
+    searchString = message['searchString']
     defaultBP = 3800000
-    userBP = ''
+    userBP = message['bp']
     antismashParams = ''
     validationErr = False
 
-    if not message['searchString']:
+    if not searchString:
         print 'empty string'
+        validationErr = True
         emit('my response',
         {'data': 'Your search term is empty. Job aborted.',
         'count': session['receive_count']})
-        validationErr = True
     else:
         try:
-            searchString = message['searchString'].decode('ascii')
+            searchString = searchString.decode('ascii')
             searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
             searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
         except:
@@ -316,10 +316,16 @@ def validateUserInput(message):
             {'data': 'Your search term contains non-processable characters. Job aborted.',
             'count': session['receive_count']})
             validationErr = True
+        if not searchString.isalpha():
+            print 'Non alphabetic characters.'
+            validationErr = True
+            emit('my response',
+            {'data': 'Your search term contains non-alphabetic characters. Job aborted.',
+            'count': session['receive_count']})
 
-    if message['bp']:
+    if userBP:
         try:
-            userBP = message['bp'].decode('ascii') 
+            userBP = userBP.decode('ascii')
         except:
             print 'Non ascii characters.'
             emit('my response',
@@ -345,7 +351,7 @@ def validateUserInput(message):
 
     if validationErr == False:
         emit('my response',
-             {'data': 'Your search term: '+message['searchString']+', bp: '+message['bp'],
+             {'data': 'Your search term: '+searchString+', bp: '+message['bp'],
              'count': session['receive_count']})
 
     return searchString, defaultBP, antismashParams, validationErr
