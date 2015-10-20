@@ -230,6 +230,8 @@ def crawl(message):
              
 def esearchUrlBuilder(retStart, retMax, searchString):
     str(retStart)
+    searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
+    searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
     url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term='+searchString+'&retmax=%s&retstart=%s' %(retMax, retStart)
     #url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Xanthomonas+albilineans&retmax=%s&retstart=%s' %(retMax, retStart)
     return url_esearch
@@ -308,18 +310,16 @@ def validateUserInput(message):
     else:
         try:
             searchString = searchString.decode('ascii')
-
-            # TODO: .isalpha() with exception of white space
-            
-            searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
-            searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
         except:
             print 'Non ascii characters.'
             emit('my response',
             {'data': 'Your search term contains non-processable characters. Job aborted.',
             'count': session['receive_count']})
             validationErr = True
-        if not searchString.isalpha():
+
+        regExp = '[^\sa-zA-Z]' # anything except word chars and whitespace
+        matchObj = re.search(regExp, searchString, flags=0)
+        if matchObj:
             print 'Non alphabetic characters.'
             validationErr = True
             emit('my response',
