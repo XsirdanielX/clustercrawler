@@ -120,7 +120,7 @@ def test_connect():
 def test_disconnect():
     print('Client disconnected')
 
-
+@app.route('/')
 @socketio.on('crawling', namespace='/test')
 def crawl(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
@@ -308,6 +308,9 @@ def validateUserInput(message):
     else:
         try:
             searchString = searchString.decode('ascii')
+
+            # TODO: .isalpha() with exception of white space
+            
             searchString = re.sub(r"[^\w\s]", '', searchString) # remove all non-word characters (everything except numbers and letters)
             searchString = re.sub(r"\s+", '+', searchString) # replace all runs of whitespace with a plus
         except:
@@ -384,7 +387,7 @@ def runAntismash(path, searchString, antismashParams):
     #    {'data': 'antiSMASH run successfully completed.',
     #    'count': session['receive_count']})
 
-    return redirect('http://www.tu-berlin.de')
+    return redirect('http://www.tu-berlin.de', code=302)
 
 
 
