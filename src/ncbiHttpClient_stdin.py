@@ -21,7 +21,7 @@ import time
 from lxml import etree
 from io import StringIO, BytesIO
 
-bpLinearDNA = 380000
+bpLinearDNA = 3800000
 retMax = '100'
 retStart = '0'
 
@@ -56,9 +56,9 @@ def waiting(retries):
 
 def esearchUrlBuilder(retStart, searchString):
 	str(retStart)
-	url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term='+searchString+'&retmax=%s&retstart=%s' %(retMax, retStart)
+	url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term='+searchString+'&field=Organism&retmax=%s&retstart=%s' %(retMax, retStart)
 	#url_esearch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Xanthomonas+albilineans&retmax=%s&retstart=%s' %(retMax, retStart)
-	return url_esearch
+	return url_esearch#!/usr/bin/python
 
 def esummaryUrlBuilder(fragmentedArray):
 	url_esummary = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nuccore&id='

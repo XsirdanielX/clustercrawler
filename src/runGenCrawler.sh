@@ -23,8 +23,8 @@ range=${#fastaFiles[@]}
 range=$((range-1))
 for i in `seq 0 $range`
 do
-	run_antismash ${fastaFiles[i]} ../out/ --inclusive --borderpredict --full-hmmer
-	#echo "$i files found: ${fastaFiles[i]}" 
+	#run_antismash ${fastaFiles[i]} ../out/ --inclusive --borderpredict --full-hmmer
+	echo "$i files found: ${fastaFiles[i]}" 
 done
 echo "Antismash completed"
 
