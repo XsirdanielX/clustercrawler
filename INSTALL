@@ -1,0 +1,8 @@
+Ubuntu 14.04:
+------------
+
+pip install flask
+pip install gevent
+pip install flask-socketio
+sudo apt-get install libxml2-dev libxslt1-dev
+pip install lxml
