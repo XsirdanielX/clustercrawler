@@ -105,7 +105,7 @@ while True:
 begin = 0
 until = retMax
 fragmentedArray = []
-# --- 
+# --- fetch fasta files and append them to one big file
 while True:
 	print 'range: %d' %(len(elementArray))
 	for i in range(begin, until):
